@@ -46,7 +46,7 @@ class PongGame:
         self.speak(self.welcome_message)
 
     def generate_welcome_message(self):
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
@@ -54,7 +54,7 @@ class PongGame:
             ],
             max_tokens=10
         )
-        return response['choices'][0]['message']['content'].strip()
+        return response.choices[0].message.content.strip()
 
     def save_history(self):
         save_history(self.conversation_history)
