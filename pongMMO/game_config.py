@@ -1,12 +1,10 @@
 # game_config.py
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-
 PLAY_AREA_WIDTH = 600
 PLAY_AREA_HEIGHT = 400
-
-BALL_RADIUS = 10
-BALL_SPEED = 2
-
 PADDLE_WIDTH = 100
 PADDLE_HEIGHT = 20
+PADDLE_SPEED = 10
+BALL_SPEED_X = .25  # Horizontal speed of the ball
+BALL_SPEED_Y = .25  # Vertical speed of the ball

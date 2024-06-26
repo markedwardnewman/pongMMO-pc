@@ -1,42 +1,33 @@
-# ball.py
 import pygame
-from game_config import BALL_RADIUS, BALL_SPEED
+from game_config import BALL_SPEED_X, BALL_SPEED_Y
 
 class Ball:
     def __init__(self, play_area_rect, hit_sound):
         self.position = pygame.Vector2(play_area_rect.centerx, play_area_rect.centery)
-        self.velocity = pygame.Vector2(BALL_SPEED, BALL_SPEED)
-        self.radius = BALL_RADIUS
-        self.play_area_rect = play_area_rect
+        self.rect = pygame.Rect(self.position.x - 10, self.position.y - 10, 20, 20)  # Assuming the ball is 20x20 px
         self.hit_sound = hit_sound
+        self.velocity = pygame.Vector2(BALL_SPEED_X, BALL_SPEED_Y)  # Use configured ball speed
+        self.play_area_rect = play_area_rect
 
     def move(self):
         self.position += self.velocity
+        self.rect.x = self.position.x
+        self.rect.y = self.position.y
 
-    def check_bounds(self, player_paddle, ai_paddle):
-        # Check collision with play area boundaries
-        if self.position.x - self.radius <= self.play_area_rect.left or self.position.x + self.radius >= self.play_area_rect.right:
+    def check_bounds(self, play_area_rect, player_paddle, ai_paddle):
+        # Example collision detection logic
+        if self.rect.left <= play_area_rect.left or self.rect.right >= play_area_rect.right:
             self.velocity.x = -self.velocity.x
-            self.hit_sound.play()
-        if self.position.y - self.radius <= self.play_area_rect.top:
+        if self.rect.top <= play_area_rect.top:
             self.velocity.y = -self.velocity.y
+        if self.rect.colliderect(player_paddle.rect) or self.rect.colliderect(ai_paddle.rect):
             self.hit_sound.play()
-        
-        # Check collision with player paddle
-        if (player_paddle.position.y - player_paddle.height / 2 <= self.position.y + self.radius <= player_paddle.position.y + player_paddle.height / 2 and
-            player_paddle.position.x - player_paddle.width / 2 <= self.position.x <= player_paddle.position.x + player_paddle.width / 2):
             self.velocity.y = -self.velocity.y
-            self.hit_sound.play()
 
-        # Check collision with AI paddle
-        if (ai_paddle.position.y - ai_paddle.height / 2 <= self.position.y - self.radius <= ai_paddle.position.y + ai_paddle.height / 2 and
-            ai_paddle.position.x - ai_paddle.width / 2 <= self.position.x <= ai_paddle.position.x + ai_paddle.width / 2):
-            self.velocity.y = -self.velocity.y
-            self.hit_sound.play()
-
-    def reset_position(self):
+    def reset(self):
         self.position = pygame.Vector2(self.play_area_rect.centerx, self.play_area_rect.centery)
-        self.velocity = pygame.Vector2(BALL_SPEED, BALL_SPEED)
+        self.velocity = pygame.Vector2(BALL_SPEED_X, BALL_SPEED_Y)
+        self.rect.topleft = (self.position.x - 10, self.position.y - 10)
 
     def draw(self, screen):
-        pygame.draw.circle(screen, (255, 255, 255), (int(self.position.x), int(self.position.y)), self.radius)
+        pygame.draw.ellipse(screen, (255, 255, 255), self.rect)

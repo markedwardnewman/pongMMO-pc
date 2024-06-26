@@ -1,35 +1,65 @@
 import pygame
-from game_config import PADDLE_WIDTH, PADDLE_HEIGHT
+from game_config import PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_SPEED
 
 class PlayerPaddle:
     def __init__(self, play_area_rect):
-        self.position = pygame.Vector2(play_area_rect.centerx, play_area_rect.bottom - PADDLE_HEIGHT)
-        self.width = PADDLE_WIDTH
-        self.height = PADDLE_HEIGHT
-        self.play_area_rect = play_area_rect
+        """ Initialize the player's paddle within the specified play area.
+        
+        Args:
+            play_area_rect (pygame.Rect): The rectangular area of the play field.
+        """
+        self.rect = pygame.Rect(play_area_rect.centerx - PADDLE_WIDTH // 2, 
+                                play_area_rect.bottom - PADDLE_HEIGHT, 
+                                PADDLE_WIDTH, PADDLE_HEIGHT)
+        self.play_area_rect = play_area_rect  # Save the play area rect
+        self.speed = PADDLE_SPEED
 
-    def move(self, dx):
-        self.position.x += dx
-        self.position.x = max(self.play_area_rect.left + self.width / 2, min(self.position.x, self.play_area_rect.right - self.width / 2))
+    def move(self, pos):
+        """ Update the paddle's horizontal position based on mouse movement.
+        
+        Args:
+            pos (tuple): The (x, y) position of the mouse or calculated position for keyboard input.
+        """
+        new_centerx = max(self.play_area_rect.left + self.rect.width // 2,
+                          min(pos[0], self.play_area_rect.right - self.rect.width // 2))
+        self.rect.centerx = new_centerx
 
     def draw(self, screen):
-        pygame.draw.rect(screen, (255, 255, 255), (self.position.x - self.width / 2, self.position.y - self.height / 2, self.width, self.height))
+        """ Draw the paddle on the screen.
+        
+        Args:
+            screen (pygame.Surface): The surface on which to draw the paddle.
+        """
+        pygame.draw.rect(screen, (255, 255, 255), self.rect)
 
 class AIPaddle:
     def __init__(self, play_area_rect):
-        self.position = pygame.Vector2(play_area_rect.centerx, play_area_rect.top + PADDLE_HEIGHT)
-        self.width = PADDLE_WIDTH
-        self.height = PADDLE_HEIGHT
-        self.speed = 5
-        self.play_area_rect = play_area_rect
+        """ Initialize the AI paddle within the specified play area.
+        
+        Args:
+            play_area_rect (pygame.Rect): The rectangular area of the play field.
+        """
+        self.rect = pygame.Rect(play_area_rect.centerx - PADDLE_WIDTH // 2, 
+                                play_area_rect.top, 
+                                PADDLE_WIDTH, PADDLE_HEIGHT)
+        self.play_area_rect = play_area_rect  # Save the play area rect
+        self.speed = PADDLE_SPEED
 
     def move(self, ball):
-        if ball.position.x > self.position.x:
-            self.position.x += self.speed
-        elif ball.position.x < self.position.x:
-            self.position.x -= self.speed
-
-        self.position.x = max(self.play_area_rect.left + self.width / 2, min(self.position.x, self.play_area_rect.right - self.width / 2))
+        """ Move the paddle based on the ball's position to simulate AI.
+        
+        Args:
+            ball (Ball): The ball object the AI is tracking.
+        """
+        if ball.position.x < self.rect.centerx:
+            self.rect.centerx = max(self.rect.centerx - self.speed, self.play_area_rect.left)
+        elif ball.position.x > self.rect.centerx:
+            self.rect.centerx = min(self.rect.centerx + self.speed, self.play_area_rect.right)
 
     def draw(self, screen):
-        pygame.draw.rect(screen, (255, 255, 255), (self.position.x - self.width / 2, self.position.y - self.height / 2, self.width, self.height))
+        """ Draw the AI paddle on the screen.
+        
+        Args:
+            screen (pygame.Surface): The surface on which to draw the AI paddle.
+        """
+        pygame.draw.rect(screen, (255, 255, 255), self.rect)
